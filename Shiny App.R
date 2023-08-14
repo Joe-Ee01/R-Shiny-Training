@@ -60,21 +60,21 @@ server <- function(input, output, session) {
           claims_subset <- claims[claims$`Loss Year` == loss_year & claims$`Development Year` <= dev_year, ]
           cumulative_matrix[i, j + 1] <- sum(claims_subset$`Amount of Claims Paid ($)`)
           
-          if (dev_year == 4 && !is.null(tail_factor)) {
+          if (dev_year == max(unique_dev_years) && !is.null(tail_factor)) {
             cumulative_matrix[i, j + 1] <- cumulative_matrix[i, j] * tail_factor
           }
           
-          if (loss_year == 2018 && dev_year == 3 && loss_year > 2017 && dev_year > 2) {
+          if (loss_year == max(unique_loss_years) - 1 && dev_year == max(unique_dev_years) - 1 && loss_year > min(unique_loss_years) && dev_year > min(unique_dev_years) + 1) {
             cumulative_matrix[i, j + 1] <- cumulative_matrix[i, j] *
               cumulative_matrix[i - 1, j+1] / cumulative_matrix[i - 1, j]
           }
           
-          if (loss_year == 2019 && dev_year == 2) {
+          if (loss_year == max(unique_loss_years) && dev_year == max(unique_dev_years) - 2) {
             cumulative_matrix[i, j + 1] <- ((cumulative_matrix[i-1, j+1] + cumulative_matrix[i-2, j+1]) / (cumulative_matrix[i-1, j] + cumulative_matrix[i-2, j])) *
               cumulative_matrix[i, j]
           }
           
-          if (loss_year == 2019 && dev_year == 3) {
+          if (loss_year == max(unique_loss_years) && dev_year == max(unique_dev_years) - 1) {
             cumulative_matrix[i, j + 1] <- cumulative_matrix[i, j] * cumulative_matrix[i-2, j+1] / cumulative_matrix[i-2, j]
           }
         }
@@ -114,3 +114,5 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
+
+
